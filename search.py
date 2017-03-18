@@ -12,7 +12,7 @@ by Pacman agents (in searchAgents.py).
 """
 
 import util
-from node import Node, solution
+from node import Node, test_node_contains, replace_frontier_with_lowest_cost
 
 class SearchProblem:
     """
@@ -90,18 +90,28 @@ def depthFirstSearch(problem):
     problem.getSuccessors(problem.getStartState())
     "*** YOUR CODE HERE ***"
     from util import Stack
+    return search(problem, Stack())
+
+
+def breadthFirstSearch(problem):
+    """
+    Search the shallowest nodes in the search tree first.
+    [2nd Edition: p 73, 3rd Edition: p 82]
+    """
+    "*** YOUR CODE HERE ***"
+    # util.raiseNotDefined()
+    from util import Queue
+    return search(problem, Queue())
+
+
+def search(problem, frontier):
     from sets import Set
     import logging
-
     logging.basicConfig(level=logging.INFO)
-
-    frontier = Stack()
     explored = Set()
-
     root = Node(None, problem.getStartState(), None, 0)
     frontier.push(root)
     level = 0
-
     while True:
         level += 1
         logging.debug("Level: %d" % level)
@@ -120,20 +130,45 @@ def depthFirstSearch(problem):
                 frontier.push(expandedNode)
 
 
-def breadthFirstSearch(problem):
-    """
-    Search the shallowest nodes in the search tree first.
-    [2nd Edition: p 73, 3rd Edition: p 82]
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
-
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    from util import PriorityQueue
+    from sets import Set
+    import logging
 
+    logging.basicConfig(level=logging.INFO)
+
+    frontier = PriorityQueue()
+    explored = Set()
+
+    root = Node(None, problem.getStartState(), None, 0)
+    frontier.push(root, root.getTotalPathCost())
+    level = 0
+
+    while True:
+        level += 1
+        logging.debug("Level: %d" % level)
+        if frontier.isEmpty(): return None
+        leafNode = frontier.pop()
+
+        if problem.isGoalState(leafNode.getState()):
+            solution = leafNode.solution()
+            logging.info("Solution node length: %d" % len(solution))
+            return solution
+
+        explored.add(leafNode.getState())
+        for (successor, action, stepCost) in problem.getSuccessors(leafNode.getState()):
+            expandedNode = Node(leafNode, successor, action, stepCost)
+            existedNodeInFrontier = test_node_contains(frontier.heap, expandedNode.getState())
+
+            if (expandedNode.getState() not in explored) and (existedNodeInFrontier is None):
+                frontier.push(expandedNode, expandedNode.getTotalPathCost())
+
+            elif (existedNodeInFrontier is not None) and (expandedNode.getTotalPathCost() < existedNodeInFrontier.getTotalPathCost()):
+                # replace that frontier node with child (less cost path)
+                existedNodeInFrontier = expandedNode
 
 def nullHeuristic(state, problem=None):
     """

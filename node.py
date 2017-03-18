@@ -10,6 +10,22 @@ def solution(node):
     l = solution(node.getParent())
     return path + l
 
+def test_node_contains(list, searchState):
+    for (priority, node) in list:
+        if (node.getState() == searchState): return node
+        else: return None
+
+def replace_frontier_with_lowest_cost(node, with_node):
+    node = with_node
+    # updated_queue = [with_node if n.getState() == node.getState() else n for n in priority_queue.heap]
+    # priority_queue.heap = updated_queue
+
+
+def calculateTotalPathCost(node):
+    if node.getParent() is None:
+        return node.getCost()
+    else:
+        return node.getCost() + calculateTotalPathCost(node.getParent())
 
 class Node:
     def __init__(self, parent, state, action, cost):
@@ -17,6 +33,10 @@ class Node:
         self.state = state
         self.action = action
         self.cost = cost
+        self.totalPathCost = calculateTotalPathCost(self)
+
+    def getTotalPathCost(self):
+        return self.totalPathCost
 
     def getState(self):
         return self.state
