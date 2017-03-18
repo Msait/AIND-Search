@@ -134,19 +134,33 @@ def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
     # util.raiseNotDefined()
+    return search_with_cost(problem)
+
+def nullHeuristic(state, problem=None):
+    """
+    A heuristic function estimates the cost from the current state to the nearest
+    goal in the provided SearchProblem.  This heuristic is trivial.
+    """
+    return 0
+
+
+def aStarSearch(problem, heuristic=nullHeuristic):
+    "Search the node that has the lowest combined cost and heuristic first."
+    "*** YOUR CODE HERE ***"
+    # util.raiseNotDefined()
+    return search_with_cost(problem, heuristic)
+
+
+def search_with_cost(problem, heuristic=None):
     from util import PriorityQueue
     from sets import Set
     import logging
-
     logging.basicConfig(level=logging.INFO)
-
     frontier = PriorityQueue()
     explored = Set()
-
     root = Node(None, problem.getStartState(), None, 0)
     frontier.push(root, root.getTotalPathCost())
     level = 0
-
     while True:
         level += 1
         logging.debug("Level: %d" % level)
@@ -164,24 +178,16 @@ def uniformCostSearch(problem):
             existedNodeInFrontier = test_node_contains(frontier.heap, expandedNode.getState())
 
             if (expandedNode.getState() not in explored) and (existedNodeInFrontier is None):
-                frontier.push(expandedNode, expandedNode.getTotalPathCost())
+                if heuristic:
+                    frontier.push(expandedNode,
+                              expandedNode.getTotalPathCost() + heuristic(expandedNode.getState(), problem))
+                else:
+                    frontier.push(expandedNode, expandedNode.getTotalPathCost())
 
-            elif (existedNodeInFrontier is not None) and (expandedNode.getTotalPathCost() < existedNodeInFrontier.getTotalPathCost()):
+            elif (existedNodeInFrontier is not None) and (
+                        expandedNode.getTotalPathCost() < existedNodeInFrontier.getTotalPathCost()):
                 # replace that frontier node with child (less cost path)
                 existedNodeInFrontier = expandedNode
-
-def nullHeuristic(state, problem=None):
-    """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
-    """
-    return 0
-
-
-def aStarSearch(problem, heuristic=nullHeuristic):
-    "Search the node that has the lowest combined cost and heuristic first."
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 
 # Abbreviations
